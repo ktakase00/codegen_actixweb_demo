@@ -1,0 +1,114 @@
+openapi: '3.0.2'
+info:
+  title: API Title
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /books:
+    get:
+      operationId: book_list
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookList'
+
+    post:
+      operationId: book_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+
+  /books/{uuid}:
+    put:
+      operationId: book_update
+      parameters:
+        - $ref: '#/components/parameters/Uuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+
+  /users/{uuid}:
+    get:
+      operationId: user_show
+      parameters:
+        - $ref: '#/components/parameters/Uuid'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  parameters:
+    Uuid:
+      name: uuid
+      in: path
+      required: true
+      schema:
+        type: UUID
+
+  schemas:
+    Book:
+      type: object
+      properties:
+        uuid:
+          type: UUID
+        title:
+          type: string
+        author:
+          type: string
+      required:
+        - uuid
+        - title
+        - author
+
+    User:
+      type: object
+      properties:
+        uuid:
+          type: UUID
+        name:
+          type: string
+      required:
+        - uuid
+        - name
+
+    BookList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Book'
+
+    BookRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+      required:
+        - uuid
+        - author
