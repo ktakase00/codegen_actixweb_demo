@@ -1,0 +1,68 @@
+use actix_web::{web, Error, HttpResponse};
+use deadpool_postgres::{Client, Pool};
+
+use crate::db;
+use crate::errors::MyError;
+use crate::models::BookRequest;
+use serde::Deserialize;
+
+#[derive(Deserialize, Debug)]
+struct SimplePath {
+    uuid: String,
+}
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+{{#vendorExtensions}}
+{{#x-resource-list}}
+    cfg.service(
+        web::resource("{{resource}}")
+{{#routes}}
+            .route(web::{{method}}().to({{operationId}}))
+{{/routes}}
+    );
+{{/x-resource-list}}
+{{/vendorExtensions}}
+}
+
+{{#operations}}
+{{#operation}}
+{{#vendorExtensions}}
+async fn {{operationId}}(
+{{#x-has-path-params}}
+    path: web::Path<SimplePath>,
+{{/x-has-path-params}}
+{{#x-has-request-params}}
+    json: web::Json<BookRequest>,
+{{/x-has-request-params}}
+    db_pool: web::Data<Pool>,
+) -> Result<HttpResponse, Error> {
+    let client: Client = db_pool.get().await.map_err(MyError::PoolError)?;
+{{#x-action-create}}
+    let item = db::{{operationId}}(&client, &json).await?;
+    let res_body = serde_json::to_string(&item)?;
+    Ok(HttpResponse::Ok().body(res_body))
+{{/x-action-create}}
+{{#x-action-update}}
+    let uuid =
+        uuid::Uuid::parse_str(&path.uuid).or(Err(MyError::InvalidUuid(path.uuid.clone())))?;
+    let item = db::{{operationId}}(&client, &uuid, &json).await?;
+    let res_body = serde_json::to_string(&item)?;
+    Ok(HttpResponse::Ok().body(res_body))
+{{/x-action-update}}
+{{#x-action-list}}
+    let list = db::{{operationId}}(&client).await?;
+    let res_body = serde_json::to_string(&list)?;
+    Ok(HttpResponse::Ok().body(res_body))
+{{/x-action-list}}
+{{#x-action-show}}
+    let uuid =
+        uuid::Uuid::parse_str(&path.uuid).or(Err(MyError::InvalidUuid(path.uuid.clone())))?;
+    let item = db::{{operationId}}(&client, &uuid).await?;
+    let res_body = serde_json::to_string(&item)?;
+    Ok(HttpResponse::Ok().body(res_body))
+{{/x-action-show}}
+}
+
+{{/vendorExtensions}}
+{{/operation}}
+{{/operations}}

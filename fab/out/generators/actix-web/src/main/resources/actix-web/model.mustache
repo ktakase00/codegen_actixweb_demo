@@ -1,0 +1,22 @@
+use serde::{Deserialize, Serialize};
+{{#models}}
+{{#model}}
+{{#vendorExtensions}}
+{{#x-table-mapping}}
+use tokio_pg_mapper_derive::PostgresMapper;
+
+#[derive(Deserialize, PostgresMapper, Serialize)]
+#[pg_mapper(table = "{{classVarName}}s")] // singular '{{classVarName}}' is a keyword..
+{{/x-table-mapping}}
+{{^x-table-mapping}}
+
+#[derive(Deserialize, Serialize)]
+{{/x-table-mapping}}
+pub struct {{name}} {
+{{#vars}}
+    pub {{name}}: {{dataType}},
+{{/vars}}
+}
+{{/vendorExtensions}}
+{{/model}}
+{{/models}}

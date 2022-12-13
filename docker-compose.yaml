@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:12.3
+    environment:
+      - POSTGRES_USER=test_user
+      - POSTGRES_DB=testing_db
+      - POSTGRES_PASSWORD=testing
+      - TZ=Asia/Tokyo
+    ports:
+      - 5432:5432

@@ -1,0 +1,5 @@
+myFile.sample
+src/org/openapitools/api/default_api.rs
+src/org/openapitools/model/book.rs
+src/org/openapitools/model/book_request.rs
+src/org/openapitools/model/user.rs
